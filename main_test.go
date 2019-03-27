@@ -3,9 +3,9 @@
 package main
 
 import (
-  "fmt"
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -18,7 +18,7 @@ var a App
 
 func TestMain(m *testing.M) {
 	a = App{}
-	a.Initialize("root", "", "rest_api_example")
+	a.Initialize("root", "secret", "rest_api_example")
 
 	ensureTableExists()
 
@@ -123,7 +123,7 @@ func addUsers(count int) {
 	}
 
 	for i := 0; i < count; i++ {
-    statement := fmt.Sprintf("INSERT INTO users(name, age) VALUES('%s', %d)", ("User " + strconv.Itoa(i+1)), ((i+1) * 10))
+		statement := fmt.Sprintf("INSERT INTO users(name, age) VALUES('%s', %d)", ("User " + strconv.Itoa(i+1)), ((i + 1) * 10))
 		a.DB.Exec(statement)
 	}
 }

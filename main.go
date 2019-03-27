@@ -2,9 +2,11 @@
 
 package main
 
+import "os"
+
 func main() {
 	a := App{}
 	a.Initialize("root", "", "rest_api_example")
 
-	a.Run(":8080")
+	a.Run(":" + os.Getenv("PORT"))
 }

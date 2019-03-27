@@ -5,29 +5,27 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
+	"github.com/jmoiron/sqlx"
 )
 
 type App struct {
 	Router *mux.Router
-	DB     *sql.DB
+	DB     *sqlx.DB
 }
 
 func (a *App) Initialize(user, password, dbname string) {
-	connectionString := fmt.Sprintf("%s:%s@/%s", user, password, dbname)
-
+	connectionString := "root:secret@tcp(localhost:3306)/rest_api_example?multiStatements=true&sql_mode=TRADITIONAL&timeout=5s"
 	var err error
-	a.DB, err = sql.Open("mysql", connectionString)
+	a.DB, err = sqlx.Open("mysql", connectionString)
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	a.Router = mux.NewRouter()
 	a.initializeRoutes()
 }
@@ -46,16 +44,16 @@ func (a *App) initializeRoutes() {
 
 func (a *App) getUsers(w http.ResponseWriter, r *http.Request) {
 	count, _ := strconv.Atoi(r.FormValue("count"))
-	start, _ := strconv.Atoi(r.FormValue("start"))
+	id, _ := strconv.Atoi(r.FormValue("id"))
 
 	if count > 10 || count < 1 {
 		count = 10
 	}
-	if start < 0 {
-		start = 0
+	if id < 0 {
+		id = 0
 	}
 
-	products, err := getUsers(a.DB, start, count)
+	products, err := getUsers(a.DB, id, count)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
