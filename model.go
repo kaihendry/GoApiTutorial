@@ -39,8 +39,8 @@ func (u *user) createUser(db *sqlx.DB) error {
 	return err
 }
 
-func getUsers(db *sqlx.DB, start, count int) (users []user, err error) {
-	rows, err := db.Queryx("SELECT * FROM users WHERE id > ? ORDER BY id LIMIT ?", start, count)
+func getUsers(db *sqlx.DB, startid, count int) (users []user, err error) {
+	rows, err := db.Queryx("SELECT * FROM users WHERE id >= ? ORDER BY id LIMIT ?", startid, count)
 	for rows.Next() {
 		var u user
 		err = rows.StructScan(&u)

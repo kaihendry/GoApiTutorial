@@ -44,16 +44,16 @@ func (a *App) initializeRoutes() {
 
 func (a *App) getUsers(w http.ResponseWriter, r *http.Request) {
 	count, _ := strconv.Atoi(r.FormValue("count"))
-	id, _ := strconv.Atoi(r.FormValue("id"))
+	startid, _ := strconv.Atoi(r.FormValue("id"))
 
 	if count > 10 || count < 1 {
 		count = 10
 	}
-	if id < 0 {
-		id = 0
+	if startid < 0 {
+		startid = 0
 	}
 
-	products, err := getUsers(a.DB, id, count)
+	products, err := getUsers(a.DB, startid, count)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
