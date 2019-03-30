@@ -19,7 +19,7 @@ type App struct {
 	DB     *sqlx.DB
 }
 
-func (a *App) Initialize(user, password, dbname string) {
+func (a *App) Initialize() {
 	connectionString := "root:secret@tcp(localhost:3306)/rest_api_example?multiStatements=true&sql_mode=TRADITIONAL&timeout=5s"
 	var err error
 	a.DB, err = sqlx.Open("mysql", connectionString)
@@ -53,13 +53,14 @@ func (a *App) getUsers(w http.ResponseWriter, r *http.Request) {
 		startid = 0
 	}
 
-	products, err := getUsers(a.DB, startid, count)
+	users, err := getUsers(a.DB, startid, count)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+	log.Printf("%#v len: %d", users, len(users))
 
-	respondWithJSON(w, http.StatusOK, products)
+	respondWithJSON(w, http.StatusOK, users)
 }
 
 func (a *App) createUser(w http.ResponseWriter, r *http.Request) {

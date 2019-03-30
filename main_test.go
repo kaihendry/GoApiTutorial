@@ -18,14 +18,10 @@ var a App
 
 func TestMain(m *testing.M) {
 	a = App{}
-	a.Initialize("root", "secret", "rest_api_example")
-
+	a.Initialize()
 	ensureTableExists()
-
 	code := m.Run()
-
 	clearTable()
-
 	os.Exit(code)
 }
 
