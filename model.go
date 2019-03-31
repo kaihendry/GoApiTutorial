@@ -31,9 +31,7 @@ func (u *user) deleteUser(db *sqlx.DB) error {
 }
 
 func (u *user) createUser(db *sqlx.DB) error {
-	result, err := db.Exec("insert into users(name, age) values(?,?)",
-		u.Name,
-		u.Age)
+	result, err := db.NamedExec("INSERT INTO table (name, age) VALUES (:Name, :Age)", u)
 	if err != nil {
 		return err
 	}
