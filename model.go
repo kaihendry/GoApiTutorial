@@ -44,11 +44,11 @@ func (u *user) createUser(db *sqlx.DB) error {
 
 func getUsers(db *sqlx.DB, startid, count int) (users []user, err error) {
 	err = db.Select(&users, "SELECT * FROM users WHERE id >= ? ORDER BY id LIMIT ?", startid, count)
-	if len(users) == 0 {
-		return []user{}, nil
-	}
 	if err != nil {
 		return users, err
+	}
+	if len(users) == 0 {
+		return []user{}, nil
 	}
 	return users, nil
 }
