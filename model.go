@@ -6,15 +6,6 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-// *string required
-// string  optional
-
-type user struct {
-	ID   int     `json:"id"`
-	Name *string `json:"name"`
-	Age  int     `json:"age,omitempty"`
-}
-
 func (u *user) getUser(db *sqlx.DB) error {
 	err := db.Get(u, "SELECT * FROM users WHERE id=?", u.ID)
 	return err

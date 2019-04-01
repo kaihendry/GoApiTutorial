@@ -88,7 +88,7 @@ func TestGetNonExistentUser(t *testing.T) {
 func TestCreateUser(t *testing.T) {
 	clearTable()
 
-	payload := []byte(`{"name":"test user","age":30}`)
+	payload := []byte(`{"name":"test user �","age":30}`)
 
 	req, _ := http.NewRequest("POST", "/user", bytes.NewBuffer(payload))
 	response := executeRequest(req)
@@ -98,7 +98,7 @@ func TestCreateUser(t *testing.T) {
 	var m map[string]interface{}
 	json.Unmarshal(response.Body.Bytes(), &m)
 
-	if m["name"] != "test user" {
+	if m["name"] != "test user �" {
 		t.Errorf("Expected user name to be 'test user'. Got '%v'", m["name"])
 	}
 

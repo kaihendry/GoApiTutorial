@@ -20,7 +20,7 @@ type App struct {
 }
 
 func (a *App) Initialize() {
-	connectionString := "root:secret@tcp(localhost:3306)/rest_api_example?multiStatements=true&sql_mode=TRADITIONAL&timeout=5s"
+	connectionString := "root:secret@tcp(localhost:3306)/rest_api_example?multiStatements=true&sql_mode=TRADITIONAL&timeout=5s&charset=utf8mb4&collation=utf8mb4_unicode_ci"
 	var err error
 	a.DB, err = sqlx.Open("mysql", connectionString)
 	if err != nil {
