@@ -5,6 +5,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"html/template"
 	"log"
 	"net/http"
 	"strconv"
@@ -20,7 +21,7 @@ type App struct {
 }
 
 func (a *App) Initialize() {
-	connectionString := "root:secret@tcp(localhost:3306)/rest_api_example?multiStatements=true&sql_mode=TRADITIONAL&timeout=5s&charset=utf8mb4&collation=utf8mb4_unicode_ci"
+	connectionString := "root:secret@tcp(localhost:3306)/rest_api_example?multiStatements=true&sql_mode=TRADITIONAL&timeout=5s&collation=utf8mb4_unicode_ci"
 	var err error
 	a.DB, err = sqlx.Open("mysql", connectionString)
 	if err != nil {
@@ -35,11 +36,53 @@ func (a *App) Run(addr string) {
 }
 
 func (a *App) initializeRoutes() {
+	a.Router.HandleFunc("/unicode", a.unicode).Methods("GET")
 	a.Router.HandleFunc("/users", a.getUsers).Methods("GET")
 	a.Router.HandleFunc("/user", a.createUser).Methods("POST")
 	a.Router.HandleFunc("/user/{id:[0-9]+}", a.getUser).Methods("GET")
 	a.Router.HandleFunc("/user/{id:[0-9]+}", a.updateUser).Methods("PUT")
 	a.Router.HandleFunc("/user/{id:[0-9]+}", a.deleteUser).Methods("DELETE")
+}
+
+func (a *App) unicode(w http.ResponseWriter, r *http.Request) {
+	type config struct {
+		Key   string `db:"Variable_name"`
+		Value string `db:"Value"`
+		Good  bool
+	}
+	var configuration []config
+	err := a.DB.Select(&configuration, `SHOW VARIABLES WHERE Variable_name LIKE 'character\_set\_%' OR Variable_name LIKE 'collation%';`)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	for i := 0; i < len(configuration); i++ {
+		if configuration[i].Value == "utf8mb4" || configuration[i].Value == "utf8mb4_unicode_ci" {
+			configuration[i].Good = true
+		}
+		if configuration[i].Key == "character_set_system" && configuration[i].Value == "utf8" {
+			configuration[i].Good = true
+		}
+		if configuration[i].Key == "character_set_filesystem" && configuration[i].Value == "binary" {
+			configuration[i].Good = true
+		}
+
+	}
+
+	var t = template.Must(template.New("").Parse(`<ol>
+{{- range . }}
+{{- if .Good }}
+<li>{{ .Key }} - {{ .Value }}</li>
+{{ else }}
+<li style="color: red">{{ .Key }} - {{ .Value }}</li>
+{{- end }}
+{{- end }}
+</ol>`))
+
+	t.Execute(w, configuration)
+
+	// fmt.Fprintf(w, "%#v", configuration)
 }
 
 func (a *App) getUsers(w http.ResponseWriter, r *http.Request) {
