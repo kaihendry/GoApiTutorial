@@ -6,13 +6,10 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-// *string required
-// string  optional
-
 type user struct {
-	ID   int     `json:"id"`
-	Name *string `json:"name"`
-	Age  int     `json:"age,omitempty"`
+	ID   int    `db:"id" json:"id"`
+	Name string `db:"name" json:"name"`
+	Age  *int   `db:"age" json:"age,omitempty"`
 }
 
 func (u *user) getUser(db *sqlx.DB) error {
@@ -21,7 +18,7 @@ func (u *user) getUser(db *sqlx.DB) error {
 }
 
 func (u *user) updateUser(db *sqlx.DB) error {
-	_, err := db.Exec("UPDATE users SET name=?, age=? WHERE id=?", u.Name, u.Age, u.ID)
+	_, err := db.NamedExec(`UPDATE users SET name=:name, age=:age WHERE id = :id`, u)
 	return err
 }
 
@@ -31,7 +28,7 @@ func (u *user) deleteUser(db *sqlx.DB) error {
 }
 
 func (u *user) createUser(db *sqlx.DB) error {
-	result, err := db.NamedExec("INSERT INTO table (name, age) VALUES (:Name, :Age)", u)
+	result, err := db.NamedExec(`INSERT INTO users (name, age) VALUES (:name, :age)`, u)
 	if err != nil {
 		return err
 	}

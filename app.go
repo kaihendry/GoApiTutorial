@@ -46,8 +46,8 @@ func (a *App) getUsers(w http.ResponseWriter, r *http.Request) {
 	count, _ := strconv.Atoi(r.FormValue("count"))
 	startid, _ := strconv.Atoi(r.FormValue("id"))
 
-	if count > 10 || count < 1 {
-		count = 10
+	if count < 1 {
+		count = 100
 	}
 	if startid < 0 {
 		startid = 0
