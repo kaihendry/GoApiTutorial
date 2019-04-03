@@ -12,7 +12,7 @@ func (u *user) getUser(db *sqlx.DB) error {
 }
 
 func (u *user) updateUser(db *sqlx.DB) error {
-	_, err := db.Exec("UPDATE users SET name=?, age=? WHERE id=?", u.Name, u.Age, u.ID)
+	_, err := db.NamedExec(`UPDATE users SET name=:name, age=:age WHERE id = :id`, u)
 	return err
 }
 
@@ -22,9 +22,7 @@ func (u *user) deleteUser(db *sqlx.DB) error {
 }
 
 func (u *user) createUser(db *sqlx.DB) error {
-	result, err := db.Exec("insert into users(name, age) values(?,?)",
-		u.Name,
-		u.Age)
+	result, err := db.NamedExec(`INSERT INTO users (name, age) VALUES (:name, :age)`, u)
 	if err != nil {
 		return err
 	}
